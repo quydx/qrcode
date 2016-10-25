@@ -1,0 +1,19 @@
+*{
+	font-family: 'Lato', sans-serif;
+}
+.main {
+  margin-top: 20%;
+}
+
+body {
+  background-image: url(https://drscdn.500px.org/photo/140636891/q%3D80_m%3D2000/a4175c2fcec8fb5eaf7b63bfa0054675);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  color: #F9F9F9;
+  font-family: 'Roboto Light', Roboto, Arial, sans-serif;
+}
+
+.jumbotron {
+  background-color: rgba(0, 0, 0, 0.5);
+}
