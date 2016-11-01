@@ -2,12 +2,13 @@
 
 /**
  author : quydx 
- last modify 25/10/2016
+ last modify 27/10/2016
  content : create qrcode from mysql records
 */
-
+$connect = NULL;
 function connectDatabase ( $databaseName ,$userName , $password , $option ) { // connect database by PDO class
 	try {
+    	global $connect;
     	$connect = new PDO("mysql:host=localhost;dbname=$databaseName", $userName, $password ,$option);
 	}
 	catch(PDOException $e) {
@@ -15,26 +16,26 @@ function connectDatabase ( $databaseName ,$userName , $password , $option ) { //
 		echo 'Không thể kết nối database :'.$e->getMessage();
 		exit();
 	}
-	return $connect;
 }
 
-function executeQuery ( $queryStr , $connect ) { // execute sql query return a array of records
+function executeQuery ( $queryStr ) { // execute sql query return a array of records
+	global $connect;
 	$results = $connect->prepare($queryStr);
     $results->setFetchMode(PDO::FETCH_ASSOC);
     $results->execute();
-    foreach ($results as $res) {
-    	$data[] = $res ;
+    while($row = $results->fetch()){
+    	$data[] = $row ;
     }
     return $data;
 }
-function createData ( $columns , $selectedColumns , $connect , $table) { // implode selected into string separate by ","
+function createData ( $selectedColumns , $table) { // implode selected into string separate by ","
 	$queryStr = "SELECT ";
 	foreach($selectedColumns as $sc ) {
-		$queryStr .= " $columns[$sc],";
+		$queryStr .= "$sc,";
 	}
 	$queryStr = rtrim($queryStr,",");
 	$queryStr .= " FROM $table";
-	$data = executeQuery ($queryStr , $connect);
+	$data = executeQuery ($queryStr);
 	foreach ($data as $data) {
 	 	$code = implode(',', $data);
 	 	$arrayCode[] = $code ;
@@ -49,21 +50,20 @@ if (isset($_POST['sql__submit'])){
     $userName 		= 'root'; 
     $userPassword 	= ''; 
     $options = array(
-	PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
-	PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+		PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
+		PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
 	);
 
     // connect database 
-   	$connect = connectDatabase ( $databaseName ,$userName , $userPassword , $options ) ;
+    connectDatabase ( $databaseName ,$userName , $userPassword , $options ) ;
 
    	//columns 
-    $columns = array("name","age", "adress", "phone");
-    $selectedColumns = array(0,1,2,3);
-    $labelColumns = array(0, 1);
+    $selectedColumns = $_POST['qrCodeColumns'];
+    $labelColumns = $_POST['labelColumns'];
 
     //create array code and label
-	$arrayCode 	= createData($columns , $selectedColumns , $connect , $table);
-	$arrayLabel = createData($columns , $labelColumns , $connect , $table);
+	$arrayCode 	= createData( $selectedColumns , $table);
+	$arrayLabel = createData( $labelColumns , $table);
 
 	//required source
 	require_once (dirname(__FILE__).'/phpqrcode/qrlib.php');
