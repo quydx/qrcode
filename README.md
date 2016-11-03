@@ -1,4 +1,4 @@
-<font color="violet">QRcode generate application</font>
+
 <h3> This is source code to generate QRcode from database built on tcpdf </h3>
 <h4> How to use ? </h4>
 Example with xampp
